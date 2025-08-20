@@ -1,49 +1,54 @@
-   let currentIndex = 0;
-    const slides = Array.from(document.querySelectorAll(".slide"));
-    const background = document.getElementById("bg");
+let currentIndex = 0;
+const slides = Array.from(document.querySelectorAll(".slide"));
+const background = document.getElementById("bg");
 
-    // Shuffle slides randomly on load
-    function shuffleArray(arr) {
-      for (let i = arr.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [arr[i].src, arr[j].src] = [arr[j].src, arr[i].src];
-      }
+// Shuffle slides randomly on load
+function shuffleArray(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+}
+
+shuffleArray(slides);
+
+function showSlide(index) {
+  slides.forEach((slide) => {
+    slide.classList.remove("active");
+
+    // Pause video if it's a video
+    if (slide.tagName === "VIDEO") {
+      slide.pause();
     }
+  });
 
-    shuffleArray(slides);
+  const currentSlide = slides[index];
+  currentSlide.classList.add("active");
 
-    function showSlide(index) {
-      slides.forEach((slide) => slide.classList.remove("active"));
-      slides[index].classList.add("active");
+  // Play video if it's a video
+  if (currentSlide.tagName === "VIDEO") {
+    currentSlide.play();
+    background.style.backgroundImage = ""; // optional: set a neutral background
+  } else if (currentSlide.tagName === "IMG") {
+    background.style.backgroundImage = `url('${currentSlide.src}')`;
+  }
+}
 
-      // Set the background image to match the current image
-      background.style.backgroundImage = `url('${slides[index].src}')`;
-    }
+function changeSlide(direction) {
+  currentIndex += direction;
 
-    function changeSlide(direction) {
-      currentIndex += direction;
+  if (currentIndex < 0) {
+    currentIndex = slides.length - 1;
+  } else if (currentIndex >= slides.length) {
+    currentIndex = 0;
+  }
 
-      if (currentIndex < 0) {
-        currentIndex = slides.length - 1;
-      } else if (currentIndex >= slides.length) {
-        currentIndex = 0;
-      }
+  showSlide(currentIndex);
+}
 
-      showSlide(currentIndex);
-    }
+// ✅ Only one initial show and one timer
+showSlide(currentIndex);
 
-    // Initialize
-    showSlide(currentIndex);
-
-    // Auto-slide every 3 seconds
-    setInterval(() => {
-      changeSlide(1);
-    },10000);
-
-        // Show the first slide 
-        showSlide(currentIndex);
-
-        // Auto-slide
-        setInterval(() => {
-            changeSlide(1); 
-        }, 10000);
+setInterval(() => {
+  changeSlide(1);
+}, 5000);
